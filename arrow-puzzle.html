@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arrow Puzzle</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f6fa;--fg:#14183a;--card:#fff;--ac:#1e88e5;--bad:#e53935}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121212;--fg:#e8eaf6;--card:#1d1f27;--ac:#42a5f5}}
+:root[data-theme="dark"]{--bg:#121212;--fg:#e8eaf6;--card:#1d1f27;--ac:#42a5f5}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,sans-serif;display:flex;flex-direction:column;align-items:center;user-select:none;-webkit-tap-highlight-color:transparent}
+h1{font-size:20px;margin:14px 0 4px}
+.bar{display:flex;gap:12px;align-items:center;justify-content:space-between;width:min(94vw,520px);margin:6px 0;font-weight:600}
+button{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-size:15px;font-weight:600}
+#board{width:min(94vw,520px);background:var(--card);border-radius:16px;touch-action:manipulation;box-shadow:0 2px 12px #0002}
+.a{transition:transform .55s ease-in,opacity .55s;cursor:pointer}
+.a polyline{fill:none;stroke:var(--fg);stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.a polygon{fill:var(--fg)}
+.a.hint polyline{stroke:var(--ac)}.a.hint polygon{fill:var(--ac)}
+.a.bad polyline{stroke:var(--bad)}.a.bad polygon{fill:var(--bad)}
+.a .hit{stroke:transparent;stroke-width:30}
+#ov{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;font-size:24px;font-weight:700;text-align:center}
+</style></head><body>
+<h1>Arrow Puzzle</h1>
+<div class="bar"><span id="lv"></span><span id="hp"></span><button id="hint">Indice</button></div>
+<svg id="board"></svg>
+<p style="opacity:.7;font-size:13px;margin:10px">Touchez une flèche pour la faire sortir. Si une autre flèche la bloque, vous perdez une vie.</p>
+<div id="ov"><div id="ovt"></div><button id="ovb"></button></div>
+<script>
+const D=[[0,-1],[1,0],[0,1],[-1,0]],CS=40;
+let level=1,lives=3,n,grid,arrows,busy=false;
+try{level=+localStorage.getItem('arrowLevel')||1}catch(e){}
+const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+function ray(a,g){const[x,y]=a.cells[a.cells.length-1],[dx,dy]=D[a.dir];let r=[],cx=x+dx,cy=y+dy;while(cx>=0&&cy>=0&&cx<n&&cy<n){r.push(cy*n+cx);cx+=dx;cy+=dy}return r}
+function free(a,g){return ray(a,g).every(i=>g[i]===-1)}
+function solvable(arr,g0){const g=g0.slice(),left=new Set(arr.map(a=>a.id));let ch=true;
+while(ch&&left.size){ch=false;for(const a of arr)if(left.has(a.id)&&free(a,g)){left.delete(a.id);a.cells.forEach(([x,y])=>g[y*n+x]=-1);ch=true}}return !left.size}
+function gen(){for(let t=0;t<500;t++){const g=Array(n*n).fill(-1),arr=[];
+const order=[...g.keys()].sort(()=>Math.random()-.5);
+for(const s of order){if(g[s]!==-1)continue;const id=arr.length,cells=[[s%n,Math.floor(s/n)]];g[s]=id;
+const L=2+Math.floor(Math.random()*5);let dir=-1;
+while(cells.length<L){const[x,y]=cells[cells.length-1];const o=[];
+D.forEach((d,i)=>{const nx=x+d[0],ny=y+d[1];if(nx>=0&&ny>=0&&nx<n&&ny<n&&g[ny*n+nx]===-1)o.push(i)});
+if(!o.length)break;const st=o.includes(dir)&&Math.random()<.5?dir:rnd(o);dir=st;
+const nx=x+D[st][0],ny=y+D[st][1];cells.push([nx,ny]);g[ny*n+nx]=id}
+if(cells.length===1)dir=Math.floor(Math.random()*4);
+arr.push({id,cells,dir})}
+if(solvable(arr,g)){arrows=arr;grid=g;return}}
+}
+function draw(){const b=$('board');b.innerHTML='';b.setAttribute('viewBox',`0 0 ${n*CS} ${n*CS}`);
+arrows.forEach(a=>{const g=document.createElementNS(NS,'g');g.setAttribute('class','a');a.el=g;
+const pts=a.cells.map(([x,y])=>[x*CS+CS/2,y*CS+CS/2]),h=pts[pts.length-1],[dx,dy]=D[a.dir];
+const pl=pts.map(p=>p.join(',')).join(' ');
+g.innerHTML=`<polyline class="hit" points="${pl}"/><polyline points="${pl}"/>`;
+const px=-dy,py=dx,tx=h[0]+dx*13,ty=h[1]+dy*13,bx=h[0]-dx*2,by=h[1]-dy*2;
+const p=document.createElementNS(NS,'polygon');
+p.setAttribute('points',`${tx},${ty} ${bx+px*8},${by+py*8} ${bx-px*8},${by-py*8}`);g.appendChild(p);
+g.addEventListener('pointerdown',()=>tap(a));b.appendChild(g)});
+$('lv').textContent='Niveau '+level;$('hp').textContent='❤'.repeat(lives)+'♡'.repeat(3-lives)}
+function tap(a){if(busy||!a.el||a.gone)return;
+if(free(a,grid)){a.gone=true;a.cells.forEach(([x,y])=>grid[y*n+x]=-1);
+const[dx,dy]=D[a.dir],k=n*CS;a.el.style.transform=`translate(${dx*k}px,${dy*k}px)`;a.el.style.opacity=0;
+setTimeout(()=>a.el.remove(),600);
+if(arrows.every(r=>r.gone))setTimeout(()=>over(true),500)}
+else{lives--;a.el.classList.add('bad');setTimeout(()=>a.el.classList.remove('bad'),400);
+$('hp').textContent='❤'.repeat(lives)+'♡'.repeat(3-lives);if(!lives){busy=true;setTimeout(()=>over(false),450)}}}
+function over(win){busy=true;$('ovt').textContent=win?'Niveau réussi !':'Plus de vies…';
+$('ovb').textContent=win?'Niveau suivant':'Réessayer';$('ov').style.display='flex';
+$('ovb').onclick=()=>{$('ov').style.display='none';if(win){level++;try{localStorage.setItem('arrowLevel',level)}catch(e){}}start()}}
+$('hint').onclick=()=>{if(busy)return;const a=arrows.find(a=>!a.gone&&free(a,grid));
+if(a){a.el.classList.add('hint');setTimeout(()=>a.el.classList.remove('hint'),1200)}};
+function start(){n=Math.min(5+Math.floor((level-1)/2),11);lives=3;busy=false;gen();draw()}
+start();
+</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4455e89cd46eeea',t:'MTc5MDk2MTUzNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body></html>

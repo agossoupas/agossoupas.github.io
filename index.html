@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pascal Ahouanse – Étudiant développeur</title>
+  <meta name="description" content="Portfolio de Pascal Ahouanse, étudiant développeur. Projets web, jeux et compétences.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <a href="#top">Accueil</a>
+    <a href="#about">Présentation</a>
+    <a href="#skills">Compétences</a>
+    <a href="#games">Jeux</a>
+    <a href="#projects">Projets</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <section class="hero" id="top">
+    <div class="av">PA</div>
+    <h1>Pascal <span class="g">Ahouanse</span></h1>
+    <p class="role">Étudiant développeur</p>
+    <a class="btn" href="#projects">Voir mes projets</a>
+    <a class="btn o" href="#contact">Me contacter</a>
+  </section>
+
+  <section id="about">
+    <h2>Présentation</h2>
+    <p>Je suis Pascal Ahouanse, étudiant en développement. Passionné par la création d'applications et de jeux, j'aime transformer une idée en un produit concret, simple à utiliser et agréable à regarder. Je suis en pleine progression et toujours curieux d'apprendre de nouvelles technologies.</p>
+  </section>
+
+  <section id="skills">
+    <h2>Compétences</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Web</h3>
+        <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span>
+      </div>
+      <div class="card">
+        <h3>Outils</h3>
+        <span class="tag">Git</span><span class="tag">GitHub</span><span class="tag">VS Code</span>
+      </div>
+      <div class="card">
+        <h3>Qualités</h3>
+        <span class="tag">Curieux</span><span class="tag">Autonome</span><span class="tag">Esprit d'équipe</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="games">
+    <h2>Jeux</h2>
+    <div class="grid">
+      <div class="card game" onclick="openG('Arrow Puzzle','arrow-puzzle.html')">
+        <div class="ic">🏹</div>
+        <h3>Arrow Puzzle</h3>
+        <p>Fais sortir toutes les flèches sans te bloquer.</p>
+        <p class="play"><span class="tag">Jouer →</span></p>
+      </div>
+      <div class="card">
+        <div class="ic">🎮</div>
+        <h3>Bientôt</h3>
+        <p>D'autres jeux arrivent.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <h2>Projets</h2>
+    <div class="grid">
+      <div class="card pj">
+        <h3>Arrow Puzzle</h3>
+        <p>Jeu de réflexion : faites sortir toutes les flèches de la grille sans vous bloquer. Niveaux générés automatiquement.</p>
+        <p class="play"><a class="l" href="javascript:void(0)" onclick="openG('Arrow Puzzle','arrow-puzzle.html')">Jouer →</a></p>
+      </div>
+      <div class="card pj">
+        <h3>Site personnel</h3>
+        <p>Ce portfolio : une vitrine pour présenter mon parcours et mes réalisations.</p>
+      </div>
+      <div class="card pj">
+        <h3>À venir</h3>
+        <p>De nouveaux projets arrivent bientôt. Restez connectés !</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2>Contact</h2>
+    <p>Une question, une opportunité de stage ou un projet à partager ? Écrivez-moi.</p>
+    <a class="btn" href="/cdn-cgi/l/email-protection#ea9a8b99898b868b82859f8b84998fdfd3aa8d878b8386c4898587">Envoyer un e-mail</a>
+  </section>
+
+  <footer>© 2026 Pascal Ahouanse</footer>
+
+  <div id="ov">
+    <div class="top">
+      <span id="ot"></span>
+      <button type="button" onclick="closeG()">✕ Fermer</button>
+    </div>
+    <iframe id="gf" title="Jeu"></iframe>
+  </div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="app.js"></script>
+</body>
+</html>
